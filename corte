@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Corte - Diseño Verde</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #e8f5e9;
+      color: #2e7d32;
+      text-align: center;
+    }
+
+    header {
+      background: #1b5e20;
+      color: #fff;
+      padding: 10px 20px;
+    }
+
+    main {
+      margin: 20px;
+    }
+
+    form {
+      background: #c8e6c9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      margin: 0 auto 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #a5d6a7;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      background: #43a047;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2e7d32;
+    }
+
+    #resultados {
+      margin-top: 20px;
+      background: #c8e6c9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    #pliego-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    #pliego {
+      position: relative;
+      border: 3px solid #1b5e20;
+      background: #a5d6a7;
+      display: inline-block;
+      margin: 0 auto;
+      transform: scale(5); /* Escala para hacerlo más grande */
+      transform-origin: center;
+      overflow: hidden;
+    }
+
+    .corte {
+      position: absolute;
+      border: 1px solid #388e3c;
+      background: rgba(56, 142, 60, 0.3);
+      box-sizing: border-box;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: #1b5e20;
+      color: #fff;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Calculadora de Corte</h1>
+    <p>Optimiza tus pliegos de forma eficiente</p>
+  </header>
+
+  <main>
+    <form id="form-calculo">
+      <h2>Dimensiones del pliego</h2>
+      <label>
+        Ancho del pliego (cm):
+        <input type="number" id="ancho-pliego" step="0.1" required>
+      </label>
+      <label>
+        Altura del pliego (cm):
+        <input type="number" id="alto-pliego" step="0.1" required>
+      </label>
+
+      <h2>Dimensiones del corte</h2>
+      <label>
+        Ancho del corte (cm):
+        <input type="number" id="ancho-corte" step="0.1" required>
+      </label>
+      <label>
+        Altura del corte (cm):
+        <input type="number" id="alto-corte" step="0.1" required>
+      </label>
+
+      <button type="button" onclick="calcular()">Calcular</button>
+    </form>
+
+    <div id="resultados"></div>
+
+    <div id="pliego-container">
+      <div id="pliego"></div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Calculadora Croma Offset</p>
+  </footer>
+
+  <script>
+    function calcular() {
+      // Obtener valores de entrada
+      const anchoPliego = parseFloat(document.getElementById('ancho-pliego').value);
+      const altoPliego = parseFloat(document.getElementById('alto-pliego').value);
+      const anchoCorte = parseFloat(document.getElementById('ancho-corte').value);
+      const altoCorte = parseFloat(document.getElementById('alto-corte').value);
+
+      // Validar entradas
+      if (
+        isNaN(anchoPliego) || isNaN(altoPliego) || 
+        isNaN(anchoCorte) || isNaN(altoCorte) ||
+        anchoPliego <= 0 || altoPliego <= 0 || 
+        anchoCorte <= 0 || altoCorte <= 0
+      ) {
+        alert('Por favor, ingrese valores válidos y mayores a cero.');
+        return;
+      }
+
+      // Cálculos principales
+      const cortesHorizontales = Math.floor(anchoPliego / anchoCorte);
+      const cortesVerticales = Math.floor(altoPliego / altoCorte);
+      const cortesTotales = cortesHorizontales * cortesVerticales;
+
+      const areaCorte = anchoCorte * altoCorte;
+      const areaPliego = anchoPliego * altoPliego;
+      const porcentajeAprovechamiento = ((cortesTotales * areaCorte) / areaPliego) * 100;
+
+      // Mostrar resultados
+      const resultadosDiv = document.getElementById('resultados');
+      resultadosDiv.innerHTML = `
+        <h2>Resultados</h2>
+        <p><strong>Cortes horizontales:</strong> ${cortesHorizontales}</p>
+        <p><strong>Cortes verticales:</strong> ${cortesVerticales}</p>
+        <p><strong>Total de cortes:</strong> ${cortesTotales}</p>
+        <p><strong>Porcentaje de aprovechamiento:</strong> ${porcentajeAprovechamiento.toFixed(2)}%</p>
+      `;
+
+      // Dibujar el pliego
+      const pliegoDiv = document.getElementById('pliego');
+      pliegoDiv.innerHTML = '';
+      pliegoDiv.style.width = `${anchoPliego}px`;
+      pliegoDiv.style.height = `${altoPliego}px`;
+
+      // Dibujar cortes
+      for (let i = 0; i < cortesVerticales; i++) {
+        for (let j = 0; j < cortesHorizontales; j++) {
+          const corteDiv = document.createElement('div');
+          corteDiv.classList.add('corte');
+          corteDiv.style.width = `${anchoCorte}px`;
+          corteDiv.style.height = `${altoCorte}px`;
+          corteDiv.style.left = `${j * anchoCorte}px`;
+          corteDiv.style.top = `${i * altoCorte}px`;
+          pliegoDiv.appendChild(corteDiv);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
